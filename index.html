@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atlas Planetário Interativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen p-4 md:p-8">
+    <div class="container mx-auto max-w-7xl">
+        <header class="mb-8 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold text-sky-400">Atlas Planetário Interativo</h1>
+            <p class="text-lg text-gray-300 mt-2">Construa e explore seus próprios sistemas estelares!</p>
+        </header>
+
+        <div class="mb-6">
+            <input type="search" id="searchBar"
+                   class="w-full p-3 text-lg rounded-lg shadow-md focus:outline-none search-input"
+                   placeholder="Buscar por planeta, lua, sistema estelar...">
+        </div>
+        <div class="mb-8 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <button id="randomAstroButton" class="action-button py-2 px-6 text-lg rounded-lg shadow-md focus:outline-none w-full sm:w-auto">
+                <span class="category-title-icon">🎲</span> Descobrir Astro Aleatório
+            </button>
+            <button id="openCreateAstroModalButton" class="action-button py-2 px-6 text-lg rounded-lg shadow-md focus:outline-none w-full sm:w-auto bg-green-600 hover:bg-green-700">
+                <span class="category-title-icon">➕</span> Criar Novo Astro
+            </button>
+        </div>
+        
+        <div class="p-4 border border-sky-800 rounded-lg mb-6 bg-gray-900/30">
+             <h2 class="text-2xl font-semibold mb-3 text-sky-400">Mapa Galáctico</h2>
+             <div id="starmapContainer" class="rounded-lg shadow-2xl overflow-hidden" style="height: 450px; cursor: crosshair;"></div>
+        </div>
+
+        <main id="categoryContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <section class="category-card p-6 rounded-lg shadow-lg" data-category-id="Astros Exóticos">
+                <h2 class="text-2xl font-semibold mb-4 text-sky-400 flex items-center"><span class="category-title-icon">✨</span>Astros Exóticos</h2>
+                <div class="category-content text-gray-200 space-y-3"></div>
+            </section>
+            <section class="category-card p-6 rounded-lg shadow-lg" data-category-id="Astros Caóticos">
+                <h2 class="text-2xl font-semibold mb-3 text-sky-400 flex items-center"><span class="category-title-icon">☄️</span>Astros Caóticos</h2>
+                 <div class="category-content text-gray-200 space-y-2"></div>
+            </section>
+            <section class="category-card p-6 rounded-lg shadow-lg" data-category-id="Astros Tóxicos">
+                <h2 class="text-2xl font-semibold mb-3 text-sky-400 flex items-center"><span class="category-title-icon">☠️</span>Astros Tóxicos</h2>
+                 <div class="category-content text-gray-200 space-y-2"></div>
+            </section>
+            <section class="category-card p-6 rounded-lg shadow-lg" data-category-id="Astros Habitáveis">
+                <h2 class="text-2xl font-semibold mb-3 text-sky-400 flex items-center"><span class="category-title-icon">🌍</span>Astros Habitáveis</h2>
+                 <div class="category-content text-gray-200 space-y-3"></div>
+            </section>
+            <section class="category-card p-6 rounded-lg shadow-lg" data-category-id="Astros Primordiais">
+                <h2 class="text-2xl font-semibold mb-3 text-sky-400 flex items-center"><span class="category-title-icon">⏳</span>Astros Primordiais</h2>
+                 <div class="category-content text-gray-200 space-y-2"></div>
+            </section>
+        </main>
+        
+        <footer class="text-center mt-12 py-6 border-t border-gray-700">
+            <p class="text-gray-400">&copy; <span id="currentYear"></span> Seu Atlas Planetário.</p>
+        </footer>
+    </div>
+    
+    <!-- Modal de Formulário -->
+    <div id="astroFormModal" class="modal fixed inset-0 z-[60] items-center justify-center p-4 hidden">
+        <div class="modal-content w-full max-w-4xl rounded-lg shadow-2xl overflow-y-auto p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="astroFormModalTitle" class="text-2xl font-bold text-sky-400"></h2>
+                <button onclick="window.closeAstroFormModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <form id="astroForm">
+                <div class="p-4 border border-sky-700 rounded-lg mb-6">
+                    <h3 class="text-xl font-semibold text-sky-300 mb-3">🚀 1. O Astro Principal</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="astroName" class="form-modal-label">Nome:</label>
+                            <input type="text" id="astroName" name="astroName" class="form-modal-input" required>
+                        </div>
+                        <div>
+                            <label for="astroCategory" class="form-modal-label">Categoria:</label>
+                            <select id="astroCategory" name="astroCategory" class="form-modal-input" required>
+                                <option value="Astros Exóticos">Astros Exóticos</option>
+                                <option value="Astros Caóticos">Astros Caóticos</option>
+                                <option value="Astros Tóxicos">Astros Tóxicos</option>
+                                <option value="Astros Habitáveis">Astros Habitáveis</option>
+                                <option value="Astros Primordiais">Astros Primordiais</option>
+                            </select>
+                        </div>
+                    </div>
+                     <div class="mt-4">
+                        <label for="astroShortDescription" class="form-modal-label">Descrição Curta:</label>
+                        <input type="text" id="astroShortDescription" name="astroShortDescription" class="form-modal-input" required>
+                    </div>
+                </div>
+                <div class="p-4 border border-purple-700 rounded-lg mb-6">
+                    <h3 class="text-xl font-semibold text-purple-300 mb-3">☀️ 2. O Sistema Estelar</h3>
+                     <div>
+                        <label for="systemStarName" class="form-modal-label">Nome da Estrela / Sistema:</label>
+                        <input type="text" id="systemStarName" name="systemStarName" class="form-modal-input" placeholder="Ex: Sol, Alpha Centauri" required>
+                    </div>
+                    <div class="mt-4">
+                        <label for="systemStarType" class="form-modal-label">Tipo da Estrela:</label>
+                        <input type="text" id="systemStarType" name="systemStarType" class="form-modal-input" placeholder="Ex: Anã Amarela (G2V)" required>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                            <label for="orbitalPosition" class="form-modal-label">Posição Orbital do Astro:</label>
+                            <input type="number" id="orbitalPosition" name="orbitalPosition" class="form-modal-input" min="1" required>
+                        </div>
+                        <div>
+                            <label for="totalPlanetsInSystem" class="form-modal-label">Total de Planetas no Sistema:</label>
+                            <input type="number" id="totalPlanetsInSystem" name="totalPlanetsInSystem" class="form-modal-input" min="1" required>
+                        </div>
+                    </div>
+                </div>
+                 <div class="p-4 border border-gray-600 rounded-lg mb-6">
+                    <h3 class="text-xl font-semibold text-gray-300 mb-3">🌙 3. Luas</h3>
+                    <div id="moonsContainer"></div>
+                    <button type="button" id="addMoonButton" class="mt-2 action-button text-sm py-1 px-3 rounded-md">Adicionar Lua</button>
+                </div>
+                <div class="p-4 border border-gray-600 rounded-lg">
+                    <h3 class="text-xl font-semibold text-gray-300 mb-3">📜 4. Detalhes Enciclopédicos</h3>
+                    <div>
+                        <label class="form-modal-label">Mídia Principal (Imagem/Vídeo):</label>
+                        <button type="button" id="mainMediaUploadButton" class="form-modal-input text-left text-gray-400">Selecionar Ficheiro...</button>
+                        <input type="hidden" name="mainMediaPath">
+                        <input type="hidden" name="mainMediaType">
+                    </div>
+                    <div class="mt-4">
+                        <label for="astroInfoGeral" class="form-modal-label">Informações Gerais:</label>
+                        <textarea id="astroInfoGeral" name="astroInfoGeral" class="form-modal-textarea" rows="5"></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label for="astroHistoria" class="form-modal-label">História:</label>
+                        <textarea id="astroHistoria" name="astroHistoria" class="form-modal-textarea" rows="5"></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label for="astroCivilizacao" class="form-modal-label">Civilização & Cultura:</label>
+                        <textarea id="astroCivilizacao" name="astroCivilizacao" class="form-modal-textarea" rows="5"></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label for="astroBiologia" class="form-modal-label">Biologia Local:</label>
+                        <textarea id="astroBiologia" name="astroBiologia" class="form-modal-textarea" rows="5"></textarea>
+                    </div>
+                </div>
+                <input type="hidden" id="editingAstroOriginalName" value="">
+                <div class="mt-8">
+                    <button type="submit" id="submitAstroFormButton" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg text-lg"></button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de Detalhes -->
+    <div id="planetModal" class="modal fixed inset-0 z-50 items-center justify-center p-4 hidden">
+        <div class="modal-content w-full max-w-5xl rounded-lg shadow-2xl overflow-y-auto p-6">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <h2 id="modalPlanetName" class="text-3xl font-bold text-sky-400"></h2>
+                    <p id="modalSystemName" class="text-lg text-purple-300"></p>
+                </div>
+                <button onclick="window.closePlanetModal()" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="w-full md:w-1/3 flex-shrink-0">
+                     <h3 class="modal-section-title">Mídia Principal</h3>
+                     <div id="mainMediaContainer" class="mt-2 h-48 bg-black rounded-lg border border-gray-700"></div>
+                     <h3 class="modal-section-title mt-4">Visualização do Sistema</h3>
+                     <div id="systemViewContainer" class="mt-2 h-80 bg-black rounded-lg border border-purple-800"></div>
+                </div>
+                <div class="w-full md:w-2/3">
+                     <div class="mb-4 border-b border-gray-700">
+                        <nav class="-mb-px flex space-x-4 overflow-x-auto" aria-label="Tabs">
+                            <button onclick="window.showTab('infoGeralTabModal', this)" class="modal-tab-button active">Info. Gerais</button>
+                            <button onclick="window.showTab('historiaTabModal', this)" class="modal-tab-button">História</button>
+                            <button onclick="window.showTab('civilizacaoTabModal', this)" class="modal-tab-button">Civilização</button>
+                            <button onclick="window.showTab('biologiaTabModal', this)" class="modal-tab-button">Biologia</button>
+                        </nav>
+                    </div>
+                    <div>
+                        <div id="infoGeralTabModal" class="modal-tab-content active"></div>
+                        <div id="historiaTabModal" class="modal-tab-content"></div>
+                        <div id="civilizacaoTabModal" class="modal-tab-content"></div>
+                        <div id="biologiaTabModal" class="modal-tab-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Outros Modais -->
+    <div id="genericMessageModal" class="modal fixed inset-0 z-[70] items-center justify-center p-4 hidden">
+        <div class="modal-content w-full max-w-md rounded-lg shadow-2xl p-6 text-center">
+            <p id="genericModalMessageText" class="text-lg text-gray-200 mb-6"></p>
+            <button id="genericModalCloseButton" class="bg-sky-600 hover:bg-sky-700 text-white font-semibold py-2 px-6 rounded-lg transition duration-150">OK</button>
+        </div>
+    </div>
+    <div id="deleteConfirmModal" class="modal fixed inset-0 z-[70] items-center justify-center p-4 hidden">
+        <div class="modal-content w-full max-w-md rounded-lg shadow-2xl p-6 text-center">
+             <h3 class="text-xl font-semibold text-red-400 mb-4">Confirmar Exclusão</h3>
+            <p class="text-gray-300">Tem a certeza que deseja excluir o astro "<span id="astroNameToDeletePlaceholder" class="font-semibold"></span>"?</p>
+            <div class="flex justify-center gap-4 mt-6">
+                <button id="confirmDeleteButton" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-lg">Confirmar</button>
+                <button id="cancelDeleteButton" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-6 rounded-lg">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.4/p5.min.js"></script>
+    <script type="module" src="js/script.js"></script>
+</body>
+</html>
+
